@@ -3,24 +3,25 @@ package com.example.refactoringstudy;
 import com.example.refactoringstudy.domain.Invoice;
 import com.example.refactoringstudy.domain.Performance;
 import com.example.refactoringstudy.domain.Play;
+import com.example.refactoringstudy.domain.Statement;
 import org.springframework.stereotype.Service;
 
-import java.text.NumberFormat;
-import java.util.Locale;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Service
-public class SampleService {
+public class StatementService {
 
-    public String statement(Invoice invoice, Map<String, Play> plays) {
-        int totalAmount = 0;
+    public Statement statement(Invoice invoice, Map<String, Play> plays) {
+        double totalAmount = 0;
         int volumeCredits = 0;
-        StringBuilder result = new StringBuilder("청구 내역 (고객명: " + invoice.getCustomer() + ")\n");
-
-        NumberFormat format = NumberFormat.getCurrencyInstance(Locale.US);
+        List<Play> performedPlays = new ArrayList<>();
 
         for (Performance performance : invoice.getPerformances()) {
             Play play = plays.get(performance.getPlayID());
+            performedPlays.add(play);
+
             int thisAmount = 0;
 
             switch (play.getType()) {
@@ -46,14 +47,14 @@ public class SampleService {
             if ("comedy".equals(play.getType())) {
                 volumeCredits += Math.floor(performance.getAudience() / 5);
             }
-
-            result.append(play.getName() + ": " + format.format(thisAmount / 100)
-                    + " (" + performance.getAudience() + "석)\n");
             totalAmount += thisAmount;
         }
 
-        result.append("총액: " + format.format(totalAmount / 100) + "\n");
-        result.append("적립 포인트: " + volumeCredits + "점\n");
-        return result.toString();
+        Statement result = new Statement();
+        result.setCustomer(invoice.getCustomer());
+        result.setPlays(performedPlays);
+        result.setTotalAmount(totalAmount / 100);
+        result.setVolumeCredits(volumeCredits);
+        return result;
     }
 }
