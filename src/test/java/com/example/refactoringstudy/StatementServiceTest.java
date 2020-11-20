@@ -41,4 +41,43 @@ class StatementServiceTest {
                 () -> Assertions.assertEquals(20, result.getVolumeCredits())
         );
     }
+
+    //small audience에 대해서도 테스트 해야하는가?
+    @Test
+    void statementForComedyLargeAudienceTest() {
+        List<Performance> performances = Collections.singletonList(new Performance("as-like", 50));
+        invoice.setPerformances(performances);
+
+        Map<String, Play> plays = Collections.singletonMap("as-like", new Play("As You Like It", "comedy"));
+        List<Play> expectPlays = Collections.singletonList(new Play("As You Like It", "comedy"));
+
+        Statement result = statementService.statement(invoice, plays);
+        Assertions.assertAll(
+                () -> Assertions.assertEquals("wonsangl", result.getCustomer()),
+                () -> Assertions.assertEquals(expectPlays, result.getPlays()),
+                () -> Assertions.assertEquals(700, result.getTotalAmount()),
+                () -> Assertions.assertEquals(30, result.getVolumeCredits())
+        );
+    }
+
+    @Test
+    void statementInvalidPlayTypeTest() {
+        List<Performance> performances = Collections.singletonList(new Performance("scream", 50));
+        invoice.setPerformances(performances);
+
+        Map<String, Play> plays = Collections.singletonMap("scream", new Play("scream", "horror"));
+
+        RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> statementService.statement(invoice, plays));
+        Assertions.assertEquals("알 수 없는 장르:horror", exception.getMessage());
+    }
+
+    @Test
+    void statementEmptyPerformanceTest() {
+
+    }
+
+    @Test
+    void statementEmptyPlaysTest() {
+
+    }
 }

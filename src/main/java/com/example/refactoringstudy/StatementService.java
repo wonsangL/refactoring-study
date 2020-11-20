@@ -39,7 +39,7 @@ public class StatementService {
                     thisAmount += 300 * performance.getAudience();
                     break;
                 default:
-                    throw new RuntimeException();
+                    throw new RuntimeException("알 수 없는 장르:" + play.getType());
             }
 
             volumeCredits += Math.max(performance.getAudience() - 30, 0);
