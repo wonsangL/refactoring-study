@@ -14,7 +14,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -73,6 +77,34 @@ class StatementServiceTest {
                 () -> Assertions.assertEquals(expectPlays, result.getPlays()),
                 () -> Assertions.assertEquals(700, result.getTotalAmount()),
                 () -> Assertions.assertEquals(30, result.getVolumeCredits())
+        );
+    }
+
+    @Test
+    void statementForMultiplePlaysTest() {
+        List<Performance> performances = Arrays.asList(
+                new Performance("hamlet", 50),
+                new Performance("As You Like It", 10),
+                new Performance("Othello", 0)
+        );
+
+        invoice.setPerformances(performances);
+
+        List<Play> expectPlays = Arrays.asList(
+                new Play("hamlet", "tragedy"),
+                new Play("As You Like It", "comedy"),
+                new Play("Othello", "tragedy")
+        );
+
+        Map<String, Play> plays = expectPlays.stream().collect(Collectors.toMap(Play::getName, play -> play));
+        when(billingFactory.billing(anyString(), anyInt())).thenReturn(60000).thenReturn(33000).thenReturn(0);
+
+        Statement result = statementService.statement(invoice, plays);
+        Assertions.assertAll(
+                () -> Assertions.assertEquals("wonsangl", result.getCustomer()),
+                () -> Assertions.assertEquals(expectPlays, result.getPlays()),
+                () -> Assertions.assertEquals(930, result.getTotalAmount()),
+                () -> Assertions.assertEquals(22, result.getVolumeCredits())
         );
     }
 
