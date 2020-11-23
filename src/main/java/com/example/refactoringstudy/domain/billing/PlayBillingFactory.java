@@ -1,5 +1,6 @@
 package com.example.refactoringstudy.domain.billing;
 
+import com.example.refactoringstudy.domain.Bills;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +15,7 @@ public class PlayBillingFactory implements BillingFactory {
     }
 
     @Override
-    public int billing(String playType, int audience) {
+    public Bills billing(String playType, int audience) {
         return createBilling(playType).billing(audience);
     }
 
