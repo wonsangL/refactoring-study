@@ -17,8 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,7 +45,7 @@ class StatementServiceTest {
         Map<String, Play> plays = Collections.singletonMap("hamlet", new Play("Hamlet", "tragedy"));
         List<Play> expectPlays = Collections.singletonList(new Play("Hamlet", "tragedy"));
 
-        when(billingFactory.billing(anyString(), anyInt())).thenReturn(new Bills(60000, 20));
+        when(billingFactory.billing(any(), any())).thenReturn(new Bills(60000, 20));
 
         Statement result = statementService.statement(invoice, plays);
         Assertions.assertAll(
@@ -66,7 +65,7 @@ class StatementServiceTest {
         Map<String, Play> plays = Collections.singletonMap("as-like", new Play("As You Like It", "comedy"));
         List<Play> expectPlays = Collections.singletonList(new Play("As You Like It", "comedy"));
 
-        when(billingFactory.billing(anyString(), anyInt())).thenReturn(new Bills(70000, 30));
+        when(billingFactory.billing(any(), any())).thenReturn(new Bills(70000, 30));
 
         Statement result = statementService.statement(invoice, plays);
         Assertions.assertAll(
@@ -89,12 +88,11 @@ class StatementServiceTest {
 
         List<Play> expectPlays = Arrays.asList(
                 new Play("hamlet", "tragedy"),
-                new Play("As You Like It", "comedy"),
-                new Play("Othello", "tragedy")
+                new Play("As You Like It", "comedy")
         );
 
         Map<String, Play> plays = expectPlays.stream().collect(Collectors.toMap(Play::getName, play -> play));
-        when(billingFactory.billing(anyString(), anyInt())).thenReturn(new Bills(60000, 20))
+        when(billingFactory.billing(any(), any())).thenReturn(new Bills(60000, 20))
                 .thenReturn(new Bills(33000, 2)).thenReturn(new Bills());
 
         Statement result = statementService.statement(invoice, plays);

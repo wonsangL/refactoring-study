@@ -11,7 +11,7 @@ import java.util.Map;
 
 @Service
 public class StatementService {
-    private BillingFactory billingFactory;
+    private final BillingFactory billingFactory;
 
     public StatementService(@Autowired BillingFactory billingFactory){
         this.billingFactory = billingFactory;
@@ -19,16 +19,14 @@ public class StatementService {
 
     public Statement statement(Invoice invoice, Map<String, Play> plays) {
         Bills totalBills = new Bills();
-
         List<Play> performedPlays = new ArrayList<>();
 
-        for (Performance performance : invoice.getPerformances()) {
-            Play play = plays.get(performance.getPlayID());
-            performedPlays.add(play);
-
-            Bills bills = billingFactory.billing(play.getType(), performance.getAudience());
-            totalBills.addAmountAndCredit(bills);
-        }
+        invoice.getPerformances().stream()
+                .filter(performance -> performance.getAudience() > 0)
+                .forEach(performance -> {
+                    totalBills.addAmountAndCredit(billingFactory.billing(performance, plays));
+                    performedPlays.add(plays.get(performance.getPlayID()));
+                });
 
         Statement result = new Statement();
         result.setCustomer(invoice.getCustomer());

@@ -1,8 +1,12 @@
 package com.example.refactoringstudy.domain.billing;
 
 import com.example.refactoringstudy.domain.Bills;
+import com.example.refactoringstudy.domain.Performance;
+import com.example.refactoringstudy.domain.Play;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 @Component
 public class PlayBillingFactory implements BillingFactory {
@@ -15,8 +19,8 @@ public class PlayBillingFactory implements BillingFactory {
     }
 
     @Override
-    public Bills billing(String playType, int audience) {
-        return createBilling(playType).billing(audience);
+    public Bills billing(Performance performance, Map<String, Play> plays) {
+        return createBilling(plays.get(performance.getPlayID()).getType()).billing(performance.getAudience());
     }
 
     @Override
